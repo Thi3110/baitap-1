@@ -23,18 +23,14 @@ jobs:
             echo "=== End preview ==="
           fi
 
-      - name: Write SSH key to file
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
-          chmod 600 id_rsa
-
       - name: Deploy using ssh
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3 # Sử dụng phiên bản cụ thể để ổn định
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key_path: "id_rsa"
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # Sử dụng key thay vì key_path
           port: 22
+          debug: true # Bật debug để có thêm thông tin
           script: |
             echo "✅ Connected to server"
             cd /baitap-1/deploy-next-docker
