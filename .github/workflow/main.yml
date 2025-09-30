@@ -16,7 +16,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: 22
         script: |
-          cd /services/deploy-next-docker
+          cd /baitap-1/deploy-next-docker
           git fetch origin
           git checkout production
           git pull
