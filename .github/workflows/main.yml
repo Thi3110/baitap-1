@@ -8,20 +8,35 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Debug SSH key
         run: |
-          echo "=== First 5 lines of SSH key ==="
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -5
-          echo "=== End preview ==="
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ SSH_PRIVATE_KEY is empty!"
+            exit 1
+          else
+            echo "✅ SSH_PRIVATE_KEY loaded"
+            echo "=== First 5 lines of SSH key ==="
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -5
+            echo "=== End preview ==="
+          fi
+
+      - name: Write SSH key to file
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
+          chmod 600 id_rsa
 
       - name: Deploy using ssh
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key_path: "id_rsa"
           port: 22
           script: |
+            echo "✅ Connected to server"
             cd /baitap-1/deploy-next-docker
             git fetch origin
             git checkout production
