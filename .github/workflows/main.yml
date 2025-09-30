@@ -8,6 +8,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug SSH key
+        run: |
+          echo "=== First 5 lines of SSH key ==="
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -5
+          echo "=== End preview ==="
+
       - name: Deploy using ssh
         uses: appleboy/ssh-action@master
         with:
