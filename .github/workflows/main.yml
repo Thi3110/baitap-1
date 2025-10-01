@@ -8,36 +8,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Debug SSH key
-        run: |
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
-            echo "❌ SSH_PRIVATE_KEY is empty!"
-            exit 1
-          else
-            echo "✅ SSH_PRIVATE_KEY loaded"
-            echo "=== First 5 lines of SSH key ==="
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -5
-            echo "=== End preview ==="
-          fi
-
-      - name: Deploy using ssh
-        uses: appleboy/ssh-action@v1.0.3 # Sử dụng phiên bản cụ thể để ổn định
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # Sử dụng key thay vì key_path
-          port: 22
-          debug: true # Bật debug để có thêm thông tin
-          script: |
-            echo "✅ Connected to server"
-            cd /baitap-1/deploy-next-docker
-            git fetch origin
-            git checkout production
-            git pull
-            docker build -t blog-starter .
-            docker stop blog-starter-container || true
-            docker rm blog-starter-container || true
-            docker run -d -p 4000:3000 --name blog-starter-container blog-starter:latest
+    - name: Deploy using ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd /root/baitap-1
+          git fetch origin
+          git checkout production
+          git pull
+          docker build -t blog-starter:latest .
+          docker stop blog-starter-container || true
+          docker rm blog-starter-container || true
+          docker run -d -p 4000:3000 --name blog-starter-container blog-starter:latest
