@@ -24,5 +24,3 @@ jobs:
           docker stop blog-starter-container || true
           docker rm blog-starter-container || true
           docker run -d -p 4000:3000 --name blog-starter-container blog-starter:latest
-
-
